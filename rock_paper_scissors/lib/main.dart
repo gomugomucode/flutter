@@ -73,10 +73,13 @@ class _GameScreenState extends State<GameScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      // Gives the whole screen canvas a modern soft background tint
+      backgroundColor: Colors.grey[100], 
       appBar: AppBar(
-        title: const Text('Rock Paper Scissors'),
-        backgroundColor: Colors.blue,
+        title: const Text('Rock Paper Scissors', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+        backgroundColor: Colors.indigo, // Darker professional theme accent
         centerTitle: true,
+        elevation: 0,
       ),
       body: Center(
         child: Column(
@@ -86,16 +89,16 @@ class _GameScreenState extends State<GameScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                Text('You: $_playerScore', style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.blue)),
-                Text('CPU: $_computerScore', style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.red)),
+                Text('You: $_playerScore', style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.indigo)),
+                Text('CPU: $_computerScore', style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.redAccent)),
               ],
             ),
-            const SizedBox(height: 40), 
+            const SizedBox(height: 50), 
 
             // Display game result text
             Text(
               _result,
-              style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+              style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.black87),
             ),
             const SizedBox(height: 40), 
             
@@ -112,10 +115,10 @@ class _GameScreenState extends State<GameScreen> {
                 child: Text(
                   'You: $_playerChoice', 
                   key: ValueKey<String>(_playerChoice), 
-                  style: const TextStyle(fontSize: 20),
+                  style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
                 ),
               ),
-              const SizedBox(height: 10),
+              const SizedBox(height: 12),
               AnimatedSwitcher(
                 duration: const Duration(milliseconds: 300),
                 transitionBuilder: (Widget child, Animation<double> animation) {
@@ -127,36 +130,43 @@ class _GameScreenState extends State<GameScreen> {
                 child: Text(
                   'Computer: $_computerChoice',
                   key: ValueKey<String>(_computerChoice),
-                  style: const TextStyle(fontSize: 20),
+                  style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
                 ),
               ),
-              const SizedBox(height: 40),
+              const SizedBox(height: 50),
             ],
 
-            // Row of interactive weapon buttons
+            // UPGRADED SECTION: Row of circular arcade-style option cards
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: List.generate(3, (index) {
                 return Padding(
-                  padding: const EdgeInsets.all(8.0),
+                  padding: const EdgeInsets.all(12.0),
                   child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      shape: const CircleBorder(),
+                      padding: const EdgeInsets.all(24),
+                      backgroundColor: Colors.white,
+                      foregroundColor: Colors.indigo,
+                      elevation: 6,
+                    ),
                     onPressed: () => _playGame(index), 
                     child: Text(
                       _emojis[index],
-                      style: const TextStyle(fontSize: 32),
+                      style: const TextStyle(fontSize: 40),
                     ),
                   ),
                 );
               }),
             ),
             
-            const SizedBox(height: 40),
+            const SizedBox(height: 50),
 
             // Reset button
             TextButton.icon(
               onPressed: _resetGame,
-              icon: const Icon(Icons.refresh, color: Colors.red),
-              label: const Text('Reset Scores', style: TextStyle(color: Colors.red, fontSize: 16)),
+              icon: const Icon(Icons.refresh, color: Colors.redAccent),
+              label: const Text('Reset Scores', style: TextStyle(color: Colors.redAccent, fontSize: 16, fontWeight: FontWeight.bold)),
             ),
           ],
         ),
