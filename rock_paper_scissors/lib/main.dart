@@ -10,7 +10,6 @@ class RockPaperScissorsApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // FIXED: Removed 'const' from MaterialApp because GameScreen is dynamic
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: const GameScreen(),
@@ -83,7 +82,7 @@ class _GameScreenState extends State<GameScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // ADDED: Live scoreboard layout at the top
+            // Scoreboard display
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
@@ -100,13 +99,36 @@ class _GameScreenState extends State<GameScreen> {
             ),
             const SizedBox(height: 40), 
             
-            // Conditional rendering: Only show choices if the player has made a move
+            // ANIMATED SECTION: Fades and pops choices into view
             if (_playerChoice.isNotEmpty) ...[
-              Text('You: $_playerChoice', style: const TextStyle(fontSize: 20)),
+              AnimatedSwitcher(
+                duration: const Duration(milliseconds: 300),
+                transitionBuilder: (Widget child, Animation<double> animation) {
+                  return ScaleTransition(
+                    scale: animation,
+                    child: FadeTransition(opacity: animation, child: child),
+                  );
+                },
+                child: Text(
+                  'You: $_playerChoice', 
+                  key: ValueKey<String>(_playerChoice), 
+                  style: const TextStyle(fontSize: 20),
+                ),
+              ),
               const SizedBox(height: 10),
-              Text(
-                'Computer: $_computerChoice',
-                style: const TextStyle(fontSize: 20),
+              AnimatedSwitcher(
+                duration: const Duration(milliseconds: 300),
+                transitionBuilder: (Widget child, Animation<double> animation) {
+                  return ScaleTransition(
+                    scale: animation,
+                    child: FadeTransition(opacity: animation, child: child),
+                  );
+                },
+                child: Text(
+                  'Computer: $_computerChoice',
+                  key: ValueKey<String>(_computerChoice),
+                  style: const TextStyle(fontSize: 20),
+                ),
               ),
               const SizedBox(height: 40),
             ],
@@ -130,7 +152,7 @@ class _GameScreenState extends State<GameScreen> {
             
             const SizedBox(height: 40),
 
-            // ADDED: Reset button at the bottom connected to your _resetGame function
+            // Reset button
             TextButton.icon(
               onPressed: _resetGame,
               icon: const Icon(Icons.refresh, color: Colors.red),
