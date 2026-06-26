@@ -1,121 +1,143 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(const RockPaperScissorsApp());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class RockPaperScissorsApp extends StatelessWidget {
+  const RockPaperScissorsApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    // FIXED: Removed 'const' from MaterialApp because GameScreen is dynamic
     return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // TRY THIS: Try running your application with "flutter run". You'll see
-        // the application has a purple toolbar. Then, without quitting the app,
-        // try changing the seedColor in the colorScheme below to Colors.green
-        // and then invoke "hot reload" (save your changes or press the "hot
-        // reload" button in a Flutter-supported IDE, or press "r" if you used
-        // the command line to start the app).
-        //
-        // Notice that the counter didn't reset back to zero; the application
-        // state is not lost during the reload. To reset the state, use hot
-        // restart instead.
-        //
-        // This works for code too, not just values: Most code changes can be
-        // tested with just a hot reload.
-        colorScheme: .fromSeed(seedColor: Colors.deepPurple),
-      ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      debugShowCheckedModeBanner: false,
+      home: const GameScreen(),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
-  final String title;
+class GameScreen extends StatefulWidget {
+  const GameScreen({super.key});
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  State<GameScreen> createState() => _GameScreenState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+class _GameScreenState extends State<GameScreen> {
+  // 1. Game Data
+  final List<String> _choices = ['Rock', 'Paper', 'Scissors'];
+  final List<String> _emojis = ['✊', '✋', '✌️'];
 
-  void _incrementCounter() {
+  // 2. State Variables
+  String _playerChoice = '';
+  String _computerChoice = '';
+  String _result = 'Choose your weapon!';
+  int _playerScore = 0;
+  int _computerScore = 0;
+
+  // 3. Game Engine Function
+  void _playGame(int playerIndex) {
+    final random = Random();
+    int computerIndex = random.nextInt(3);
+
     setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
+      _playerChoice = '${_emojis[playerIndex]} ${_choices[playerIndex]}';
+      _computerChoice = '${_emojis[computerIndex]} ${_choices[computerIndex]}';
+
+      if (playerIndex == computerIndex) {
+        _result = "It's a tie! 👔";
+      } else if ((playerIndex == 0 && computerIndex == 2) ||
+          (playerIndex == 1 && computerIndex == 0) ||
+          (playerIndex == 2 && computerIndex == 1)) {
+        _result = "You Win! 🎉";
+        _playerScore++; 
+      } else {
+        _result = "Computer Wins! 😢";
+        _computerScore++; 
+      }
+    });
+  }
+
+  // 4. Reset function
+  void _resetGame() {
+    setState(() {
+      _playerScore = 0;
+      _computerScore = 0;
+      _playerChoice = '';
+      _computerChoice = '';
+      _result = 'Choose your weapon!';
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
     return Scaffold(
       appBar: AppBar(
-        // TRY THIS: Try changing the color here to a specific color (to
-        // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
-        // change color while the other colors stay the same.
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
+        title: const Text('Rock Paper Scissors'),
+        backgroundColor: Colors.blue,
+        centerTitle: true,
       ),
       body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
         child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          //
-          // TRY THIS: Invoke "debug painting" (choose the "Toggle Debug Paint"
-          // action in the IDE, or press "p" in the console), to see the
-          // wireframe for each widget.
-          mainAxisAlignment: .center,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Text('You have pushed the button this many times:'),
+            // ADDED: Live scoreboard layout at the top
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                Text('You: $_playerScore', style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.blue)),
+                Text('CPU: $_computerScore', style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.red)),
+              ],
+            ),
+            const SizedBox(height: 40), 
+
+            // Display game result text
             Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
+              _result,
+              style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 40), 
+            
+            // Conditional rendering: Only show choices if the player has made a move
+            if (_playerChoice.isNotEmpty) ...[
+              Text('You: $_playerChoice', style: const TextStyle(fontSize: 20)),
+              const SizedBox(height: 10),
+              Text(
+                'Computer: $_computerChoice',
+                style: const TextStyle(fontSize: 20),
+              ),
+              const SizedBox(height: 40),
+            ],
+
+            // Row of interactive weapon buttons
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: List.generate(3, (index) {
+                return Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: ElevatedButton(
+                    onPressed: () => _playGame(index), 
+                    child: Text(
+                      _emojis[index],
+                      style: const TextStyle(fontSize: 32),
+                    ),
+                  ),
+                );
+              }),
+            ),
+            
+            const SizedBox(height: 40),
+
+            // ADDED: Reset button at the bottom connected to your _resetGame function
+            TextButton.icon(
+              onPressed: _resetGame,
+              icon: const Icon(Icons.refresh, color: Colors.red),
+              label: const Text('Reset Scores', style: TextStyle(color: Colors.red, fontSize: 16)),
             ),
           ],
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
       ),
     );
   }
